@@ -4,5 +4,5 @@ subnet_ids = [
 ]
 username = ""
 password = ""
-vpc_id = "vpc-06ee978b545c5fc37"
-name = "acme-db"
+vpc_id   = "vpc-06ee978b545c5fc37"
+name     = "acme-db"

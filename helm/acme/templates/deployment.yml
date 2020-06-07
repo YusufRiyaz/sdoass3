@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: "app"
+spec:
+  selector:
+    matchLabels:
+      app: "app"
+  replicas: {{ .Values.replicaCount }}
+  template:
+    metadata:
+      labels:
+        app: "app"
+    spec:
+      containers:
+      - image: {{ .Values.image }}
+        name: "app"
+        env:
+          - name: VTT_DBHOST
+            value: {{ .Values.dbhost }}
+        ports:
+        - containerPort: 80

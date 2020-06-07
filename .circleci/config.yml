@@ -32,14 +32,16 @@ jobs:
     steps:
       - checkout
       
-      - run: |
-          cd src
-          npm install
-          npm run test-lint
-          npm run test-unit
-          npm run test-coverage
-          mkdir -p test-results/unit 
-          mv test-results.xml test-results/unit/results.xml
+      - run:
+          name: Run  Lint,Unit and Coverage testing
+          command: |
+            cd src
+            npm install
+            npm run test-lint
+            npm run test-unit
+            npm run test-coverage
+            mkdir -p test-results/unit 
+            mv test-results.xml test-results/unit/results.xml
       
       - store_test_results:
           path: src/test-results
@@ -157,8 +159,63 @@ jobs:
           root: ./
           paths:
             - artifacts
+  
+  deploy-test:
+    machine: true
+    environment:
+      ECR: 234004604603.dkr.ecr.us-east-1.amazonaws.com
+      reponame: app
+      NODE_ENV: test
+      ENV:  test
+    steps:
+      - attach_workspace:
+          at: ./
 
+      - setup-cd
 
+      - run:
+          name: deploy infra
+          command: |
+            cd artifacts/infra
+            make init 
+            make up
+      - run:
+          name: Generate namespace
+          command: |
+            kubectl namespace test
+      - run:
+          name: deploy application
+          command: |
+            helm upgrade helm/acme artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
+  
+  deploy-prod:
+    machine: true
+    environment:
+      ECR: 234004604603.dkr.ecr.us-east-1.amazonaws.com
+      reponame: app
+      NODE_ENV: production
+      ENV:  prod
+    steps:
+      - attach_workspace:
+          at: ./
+
+      - setup-cd
+
+      - run:
+          name: deploy infra
+          command: |
+            cd artifacts/infra
+            make init 
+            make up
+      - run:
+          name: Generate namespace
+          command: |
+            kubectl namespace prod
+      - run:
+          name: deploy application
+          command: |
+            helm upgrade helm/acme artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
+      
 
 workflows:
   version: 2
@@ -175,6 +232,9 @@ workflows:
           requires:
             - e2e
             - integration
+      - deploy-test:
+          requires:
+            - package
           filters:
             branches:
               only: master

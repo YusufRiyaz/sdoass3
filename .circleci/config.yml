@@ -155,6 +155,10 @@ jobs:
           name: Package infra
           command: |
             cp -r infra artifacts/infra
+      - run:
+          name: Package environment
+          command: |
+            cp -r environment artifacts/environment
 
       - persist_to_workspace:
           root: ./

@@ -185,13 +185,9 @@ jobs:
             make init 
             make up
       - run:
-          name: Generate namespace
-          command: |
-            kubectl create namespace test
-      - run:
           name: deploy application
           command: |
-            helm upgrade helm/acme artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
+            helm upgrade artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
   
   deploy-prod:
     machine: true

@@ -183,7 +183,7 @@ jobs:
       - run:
           name: Generate namespace
           command: |
-            kubectl namespace test
+            kubectl create namespace test
       - run:
           name: deploy application
           command: |

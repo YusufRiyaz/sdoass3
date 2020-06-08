@@ -180,8 +180,7 @@ jobs:
             cd artifacts/infra
             make init 
             make up
-            touch dbhost.txt
-            terraform output endpoint > ../artifacts/dbhost.txt
+            terraform output endpoint > ../dbhost.txt
       - run:
           name: deploying application
           command: |

@@ -22,7 +22,7 @@ commands:
           curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
           chmod +x kops-linux-amd64
           sudo mv kops-linux-amd64 /usr/local/bin/kops
-          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-i5g4ea
+          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-i5g4ea 
 
 
 jobs:
@@ -95,7 +95,7 @@ jobs:
       - checkout
 
       - run:
-          name: set up environment
+          name: setting up environment
           command: |
             cd src
             npm install 
@@ -105,7 +105,7 @@ jobs:
             psql -h localhost -U postgres -c "CREATE DATABASE servian;"
 
       - run: 
-          name: End 2 end tests
+          name:  Run End 2 end tests
           no_output_timeout: 2m
           command: |
             cd src
@@ -124,7 +124,7 @@ jobs:
       - checkout
 
       - run:
-          name: Set up
+          name: Setting up artifacts directory and installing dependencies
           command: |
             mkdir -p artifacts
 
@@ -147,17 +147,13 @@ jobs:
             docker push ${IMAGE_TAG}
 
       - run:
-          name: Package helm
+          name: Package helm and place in artifacts directory
           command: | 
             helm package helm/acme --app-version ${CIRCLE_SHA1} -d artifacts
       - run:
-          name: Package infra
+          name: Package infrastructure 
           command: |
             cp -r infra artifacts/infra
-      - run:
-          name: Package environment
-          command: |
-            cp -r environment artifacts/environment
 
       - persist_to_workspace:
           root: ./
@@ -179,15 +175,16 @@ jobs:
 
 
       - run:
-          name: deploy infra
+          name: deploying backend infrastructure
           command: |
             cd artifacts/infra
             make init 
             make up
+            terraform output endpoint > ../artifacts/dbhost.txt
       - run:
-          name: deploy application
+          name: deploying application
           command: |
-            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
+            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
   
   deploy-prod:
     machine: true
@@ -201,21 +198,18 @@ jobs:
           at: ./
 
       - setup-cd
-
+      
       - run:
-          name: deploy infra
+          name: deploying backend infrastructure
           command: |
             cd artifacts/infra
             make init 
             make up
+            terraform output endpoint > ../artifacts/dbhost.txt
       - run:
-          name: Generate namespace
+          name: deploying application
           command: |
-            kubectl namespace prod
-      - run:
-          name: deploy application
-          command: |
-            helm upgrade helm/acme artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt)
+            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
       
 
 workflows:
@@ -223,19 +217,22 @@ workflows:
   build-test-package:
     jobs:
       - build
-      # - integration:
-      #     requires: 
-      #       - build
-      # - e2e:
-      #     requires:
-      #       - build
-      - package
-      #     requires:
-      #       - e2e
-      #       - integration
+      - integration:
+          requires: 
+            - build
+      - e2e:
+          requires:
+            - build
+      - package:
+          requires:
+            - e2e
+            - integration
       - deploy-test:
           requires:
             - package
+      - deploy-prod:
+          requires:
+            - deploy-test
           filters:
             branches:
               only: master

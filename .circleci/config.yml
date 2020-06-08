@@ -177,12 +177,6 @@ jobs:
 
       - setup-cd
 
-      - run: 
-          name: deploy environment
-          command: |
-            cd artifacts/environment
-            make up
-
 
       - run:
           name: deploy infra

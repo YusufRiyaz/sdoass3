@@ -1,3 +1,3 @@
 replicaCount: 1
-image: #image set via helm upgrade set command
-dbhost: #dbhost set via helm upgrade set command
+image: 234004604603.dkr.ecr.us-east-1.amazonaws.com/app:f1bd3e6dfa56bf120b5b5a911c310a07cfe922fc
+dbhost: localhost

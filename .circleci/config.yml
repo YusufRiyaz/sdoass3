@@ -180,6 +180,7 @@ jobs:
             cd artifacts/infra
             make init 
             make up
+            touch dbhost.txt
             terraform output endpoint > ../artifacts/dbhost.txt
       - run:
           name: deploying application
@@ -198,7 +199,7 @@ jobs:
           at: ./
 
       - setup-cd
-      
+
       - run:
           name: deploying backend infrastructure
           command: |
@@ -217,22 +218,24 @@ workflows:
   build-test-package:
     jobs:
       - build
-      - integration:
-          requires: 
-            - build
-      - e2e:
-          requires:
-            - build
+      # - integration:
+      #     requires: 
+      #       - build
+      # - e2e:
+      #     requires:
+      #       - build
       - package:
           requires:
-            - e2e
-            - integration
+            - build
+          # requires:
+          #   - e2e
+          #   - integration
       - deploy-test:
           requires:
             - package
-      - deploy-prod:
-          requires:
-            - deploy-test
+      # - deploy-prod:
+      #     requires:
+      #       - deploy-test
           filters:
             branches:
               only: master

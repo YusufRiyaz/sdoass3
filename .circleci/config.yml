@@ -22,7 +22,7 @@ commands:
           curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
           chmod +x kops-linux-amd64
           sudo mv kops-linux-amd64 /usr/local/bin/kops
-          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-i5g4ea 
+          kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-hlpovo
 
 
 jobs:
@@ -210,7 +210,7 @@ jobs:
           name: deploying application
           command: |
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
-      
+            
 
 workflows:
   version: 2

@@ -1,8 +1,8 @@
 subnet_ids = [
-  "subnet-091d4b5347a892f97",
-  "subnet-0f3db91738a94a924"
+  "subnet-0078e02339ce0debf",
+  "subnet-0fd4b1fdceaea4420"
 ]
-username = "rmit"
-password = "rmitrmit"
-vpc_id   = "vpc-06ee978b545c5fc37"
-name     = "acme-db"
+username = "testuser"
+password = "TestPass"
+vpc_id   = "vpc-06a2c9034eeadd1e5"
+name     = "app"

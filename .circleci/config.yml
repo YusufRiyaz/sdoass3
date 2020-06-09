@@ -217,18 +217,16 @@ workflows:
   build-test-package:
     jobs:
       - build
-      # - integration:
-      #     requires: 
-      #       - build
-      # - e2e:
-      #     requires:
-      #       - build
-      - package:
+      - integration:
+          requires: 
+            - build
+      - e2e:
           requires:
             - build
-          # requires:
-          #   - e2e
-          #   - integration
+      - package:
+          requires:
+            - e2e
+            - integration
       - deploy-test:
           requires:
             - package

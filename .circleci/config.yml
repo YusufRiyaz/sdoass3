@@ -111,7 +111,7 @@ jobs:
             cd src
 
             npm run start:prod & 
-            npx wait-on http://localhost:3000
+            npx wait-on http://ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
             npm run test-e2e
 
   package:

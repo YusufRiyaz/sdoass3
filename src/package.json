@@ -5,6 +5,7 @@
   "scripts": {
     "start": "node ./bin/www",
     "start:prod": "NODE_ENV=production node ./bin/www",
+    "start:test": "NODE_ENV=test node ./bin/www",
     "test": "npm run test-unit && npm run test-integration",
     "test-lint": "eslint .",
     "test-unit": "NODE_ENV=unit nyc --reporter none mocha test/unit/*.test.js --reporter mocha-junit-reporter",

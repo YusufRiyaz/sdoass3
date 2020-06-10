@@ -110,7 +110,7 @@ jobs:
           command: |
             cd src
 
-            npm run start:prod & 
+            npm run start:test & 
             npx wait-on http://localhost:3000
             npm run test-e2e
 
@@ -180,7 +180,15 @@ jobs:
             cd artifacts/infra
             make init 
             make up
-            terraform output endpoint > ../dbhost.txt
+            terraform output endpoint
+            terraform output endpoint > ../dbhost.txtd
+
+      - run:
+          name: migrating database 
+          command: |
+            cd src
+            npm install
+            node_modules/.bin/sequelize db:migrate
       - run:
           name: deploying application
           command: |

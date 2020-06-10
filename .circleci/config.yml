@@ -222,16 +222,16 @@ workflows:
   build-test-package:
     jobs:
       - build
-      - integration:
-          requires: 
-            - build
-      - e2e:
-          requires:
-            - build
-      - package:
-          requires:
-            - e2e
-            - integration
+      # - integration:
+      #     requires: 
+      #       - build
+      # - e2e:
+      #     requires:
+      #       - build
+      - package
+          # requires:
+          #   - e2e
+          #   - integration
       - deploy-test:
           requires:
             - package

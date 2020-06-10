@@ -183,15 +183,7 @@ jobs:
             make init 
             make up
             terraform output endpoint
-            terraform output endpoint > ../dbhost.txtd
-
-      - run:
-          name: migrating database 
-          command: |
-            cd /home/circleci/project/src
-            npm install
-            node_modules/.bin/sequelize db:migrate
-            npm start
+            terraform output endpoint > ../dbhost.txt
       - run:
           name: deploying application
           command: |

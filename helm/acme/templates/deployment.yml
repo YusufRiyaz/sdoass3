@@ -16,7 +16,7 @@ spec:
       - image: {{ .Values.image }}
         name: "app"
         env:
-          - name: VTT_DBHOST
+          - name: DB_HOSTNAME
             value: {{ .Values.dbhost }}
         ports:
         - containerPort: 80

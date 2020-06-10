@@ -86,10 +86,10 @@ jobs:
           POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
-      DB_USERNAME: postgres
-      DB_PASSWORD: password
+      DB_USERNAME: testuser
+      DB_PASSWORD: TestPass
       DB_NAME: servian
-      DB_HOSTNAME: localhost
+      DB_HOSTNAME: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
 
     steps: 
       - checkout
@@ -110,7 +110,7 @@ jobs:
           command: |
             cd src
 
-            npm run start:test & 
+            npm run start:prod & 
             npx wait-on http://localhost:3000
             npm run test-e2e
 
@@ -198,10 +198,10 @@ jobs:
     environment:
       ECR: 234004604603.dkr.ecr.us-east-1.amazonaws.com
       reponame: app
-      NODE_ENV: production
+      NODE_ENV: prod
       ENV:  prod
     steps:
-      - checkout 
+      - checkout
 
       - attach_workspace:
           at: ./
@@ -214,12 +214,19 @@ jobs:
             cd artifacts/infra
             make init 
             make up
-            terraform output endpoint > ../artifacts/dbhost.txt
+            terraform output endpoint
+            terraform output endpoint > ../dbhost.txt
+
       - run:
           name: deploying application
           command: |
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
-            
+
+      - run: 
+          name: seed database 
+          command: |
+            kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
+  
 
 workflows:
   version: 2
@@ -229,19 +236,23 @@ workflows:
       # - integration:
       #     requires: 
       #       - build
-      # - e2e:
-      #     requires:
-      #       - build
-      - package
-          # requires:
-          #   - e2e
+      - e2e:
+          requires:
+            - build
+      - package:
+          requires:
+             - e2e
           #   - integration
       - deploy-test:
           requires:
             - package
-      # - deploy-prod:
-      #     requires:
-      #       - deploy-test
+      - approval:
+          type: approval
+          requires: 
+            - deploy-test
+      - deploy-prod:
+          requires:
+            - approval
           filters:
             branches:
               only: master

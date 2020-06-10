@@ -168,6 +168,8 @@ jobs:
       NODE_ENV: test
       ENV:  test
     steps:
+      - checkout
+
       - attach_workspace:
           at: ./
 
@@ -186,6 +188,7 @@ jobs:
       - run:
           name: migrating database 
           command: |
+            cd ..
             cd src
             npm install
             node_modules/.bin/sequelize db:migrate
@@ -202,6 +205,8 @@ jobs:
       NODE_ENV: production
       ENV:  prod
     steps:
+      - checkout 
+
       - attach_workspace:
           at: ./
 

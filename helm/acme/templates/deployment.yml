@@ -25,4 +25,4 @@ spec:
           - name: DB_NAME 
             value: servian
         ports:
-        - containerPort: 80
+        - containerPort: 3000

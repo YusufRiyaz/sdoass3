@@ -188,8 +188,7 @@ jobs:
       - run:
           name: migrating database 
           command: |
-            cd ..
-            cd src
+            cd /home/circleci/project/src
             npm install
             node_modules/.bin/sequelize db:migrate
       - run:

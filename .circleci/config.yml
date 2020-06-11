@@ -86,12 +86,12 @@ jobs:
           POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
-      DB_USERNAME: testuser
-      DB_PASSWORD: TestPass
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
       DB_NAME: servian
       DB_HOSTNAME: localhost
       env: test
-      ENDPOINT: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
+      ENDPOINT: 100.68.183.98
 
     steps: 
       - checkout

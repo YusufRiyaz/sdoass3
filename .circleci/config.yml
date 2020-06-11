@@ -90,6 +90,7 @@ jobs:
       DB_PASSWORD: password
       DB_NAME: servian
       DB_HOSTNAME: localhost
+      ENDPOINT: app-test.cluster-cig88tgnk6az.us-east-1.rds.amazonaws.com
 
     steps: 
       - checkout
@@ -110,7 +111,7 @@ jobs:
           command: |
             cd src
 
-            npm run start:test & 
+            npm run start:prod & 
             npx wait-on http://localhost:3000
             npm run test-e2e
 
@@ -236,13 +237,12 @@ workflows:
       # - integration:
       #     requires: 
       #       - build
-      # - e2e:
-      #     requires:
-      #       - build
+      - e2e:
+          requires:
+          - build
       - package:
           requires:
-            - build
-          #   - e2e
+             - e2e
           #   - integration
       - deploy-test:
           requires:

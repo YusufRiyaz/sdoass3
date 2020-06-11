@@ -86,10 +86,10 @@ jobs:
           POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
-      DB_USERNAME: testuser
-      DB_PASSWORD: TestPass
+      DB_USERNAME: postgres
+      DB_PASSWORD: password
       DB_NAME: servian
-      DB_HOSTNAME: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
+      DB_HOSTNAME: localhost
 
     steps: 
       - checkout
@@ -110,8 +110,8 @@ jobs:
           command: |
             cd src
 
-            npm run start:prod & 
-            npx wait-on http://ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
+            npm run start:test & 
+            npx wait-on http://localhost:3000
             npm run test-e2e
 
   package:
@@ -189,7 +189,7 @@ jobs:
           command: |
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
       - run: 
-          name: seed database 
+          name: migrate database 
           command: |
             kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
   
@@ -223,7 +223,7 @@ jobs:
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
 
       - run: 
-          name: seed database 
+          name: migrate database 
           command: |
             kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
   
@@ -236,12 +236,13 @@ workflows:
       # - integration:
       #     requires: 
       #       - build
-      - e2e:
-          requires:
-            - build
+      # - e2e:
+      #     requires:
+      #       - build
       - package:
           requires:
-             - e2e
+            - build
+          #   - e2e
           #   - integration
       - deploy-test:
           requires:

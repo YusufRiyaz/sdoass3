@@ -220,12 +220,12 @@ jobs:
       - run:
           name: deploying application
           command: |
-            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
+            helm upgrade app artifacts/acme-0.1.0.tgz -i -n prod --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
 
       - run: 
           name: migrate database 
           command: |
-            kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
+            kubectl exec deployment/app -n prod -- node_modules/.bin/sequelize db:migrate --env production
   
 
 workflows:

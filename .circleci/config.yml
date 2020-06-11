@@ -90,7 +90,8 @@ jobs:
       DB_PASSWORD: password
       DB_NAME: servian
       DB_HOSTNAME: localhost
-      ENDPOINT: app-test.cluster-cig88tgnk6az.us-east-1.rds.amazonaws.com
+      env: test
+      ENDPOINT: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
 
     steps: 
       - checkout

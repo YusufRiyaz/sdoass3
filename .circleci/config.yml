@@ -91,8 +91,6 @@ jobs:
       DB_NAME: servian
       DB_HOSTNAME: localhost
       env: test
-      ENDPOINT: app-test.cluster-cig88tgnk6az.us-east-1.rds.amazonaws.com
-
     steps: 
       - checkout
 

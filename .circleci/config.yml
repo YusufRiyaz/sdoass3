@@ -89,8 +89,9 @@ jobs:
       DB_USERNAME: postgres
       DB_PASSWORD: password
       DB_NAME: servian
-      DB_HOSTNAME: localhost
-      env: test
+      # DB_HOSTNAME: localhost
+      # ENDPOINT: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
+
     steps: 
       - checkout
 
@@ -187,7 +188,6 @@ jobs:
       - run:
           name: deploying application
           command: |
-            kubectl get namespace test || kubectl create namespace test
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
       - run: 
           name: migrate database 
@@ -221,7 +221,6 @@ jobs:
       - run:
           name: deploying application
           command: |
-            kubectl get namespace prod || kubectl create namespace prod
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n prod --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
 
       - run: 
@@ -238,12 +237,13 @@ workflows:
       # - integration:
       #     requires: 
       #       - build
-      - e2e:
-          requires:
-          - build
+      # - e2e:
+      #     requires:
+      #     - build
       - package:
           requires:
-             - e2e
+            - build
+            #  - e2e
           #   - integration
       - deploy-test:
           requires:

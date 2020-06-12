@@ -170,7 +170,6 @@ jobs:
   deploy-test:
     docker:
       - image: cimg/base:2020.01
-    machine: true
     environment:
       ECR: 234004604603.dkr.ecr.us-east-1.amazonaws.com
       reponame: app

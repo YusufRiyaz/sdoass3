@@ -81,6 +81,9 @@ jobs:
   e2e:
     docker:
       - image: qawolf/qawolf:v0.9.2
+      - image: postgres:10.7
+        environment:
+          POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
       DB_USERNAME: postgres
@@ -187,7 +190,7 @@ jobs:
           name: deploying application
           command: |
             kubectl get namespace test || kubectl create namespace test
-            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),env=prod,dbusername=postgres,dbpassword=password,dbhost=$(cat artifacts/dbhost.txt)
+            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
       - run: 
           name: migrate database 
           command: |

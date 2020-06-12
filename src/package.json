@@ -10,7 +10,7 @@
     "test-unit": "NODE_ENV=unit nyc --reporter none mocha test/unit/*.test.js --reporter mocha-junit-reporter",
     "test-coverage": "NODE_ENV=unit nyc report --lines 90 --check-coverage",
     "test-integration": "DB_USERNAME=postgres DB_PASSWORD=password DB_NAME=servian DB_HOSTNAME=localhost NODE_ENV=integration ./node_modules/.bin/mocha test/integration/*.test.js --reporter mocha-junit-reporter",
-    "test-e2e": "NODE_ENV=e2e DB_USERNAME=postgres DB_PASSWORD=password DB_NAME=servian npx jest --config={} --preset=\"@qawolf/jest-plugin\" --rootDir=.qawolf --testTimeout=60000 --runInBand --forceExit"
+    "test-e2e": "NODE_ENV=e2e DB_USERNAME=testuser DB_PASSWORD=TestPass DB_NAME=servian npx jest --config={} --preset=\"@qawolf/jest-plugin\" --rootDir=.qawolf --testTimeout=60000 --runInBand --forceExit"
   },
   "dependencies": {
     "bluebird": "^3.5.1",

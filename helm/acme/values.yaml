@@ -1,3 +1,6 @@
 replicaCount: 3
+env: prod
 image: 
-dbhost: 
+dbhost:
+dbusername: postgres
+dbpassword: password 

@@ -81,17 +81,14 @@ jobs:
   e2e:
     docker:
       - image: qawolf/qawolf:v0.9.2
-      - image: postgres:10.7
-        environment:
-          POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
-      DB_USERNAME: postgres
-      DB_PASSWORD: password
-      DB_NAME: servian
-      DB_HOSTNAME: localhost
-      env: test
-      ENDPOINT: 100.68.183.98
+      # DB_USERNAME: postgres
+      # DB_PASSWORD: password
+      # DB_NAME: servian
+      # DB_HOSTNAME: localhost
+      # env: test
+      # ENDPOINT: endpointurl
 
     steps: 
       - checkout
@@ -99,21 +96,29 @@ jobs:
       - run:
           name: setting up environment
           command: |
-            cd src
-            npm install 
-            apt update
-            apt install postgresql-client-10 -y
-            
-            psql -h localhost -U postgres -c "CREATE DATABASE servian;"
+           # install kubectl
+           curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+           chmod +x ./kubectl 
+           sudo mv ./kubectl /usr/local/bin/kubectl
+
+
+           # configure kops
+           curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+           chmod +x kops-linux-amd64
+           sudo mv kops-linux-amd64 /usr/local/bin/kops
+           kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-hlpovo
+
+           apt-get install jq -y
+
+
 
       - run: 
           name:  Run End 2 end tests
           no_output_timeout: 2m
           command: |
+            export ENDPOINT= (app-test.cluster-cig88tgnk6az.us-east-1.rds.amazonaws.com)
             cd src
-
-            npm run start:prod & 
-            npx wait-on http://localhost:3000
+            npm install
             npm run test-e2e
 
   package:
@@ -163,6 +168,8 @@ jobs:
             - artifacts
   
   deploy-test:
+    docker:
+      - image: cimg/base:2020.01
     machine: true
     environment:
       ECR: 234004604603.dkr.ecr.us-east-1.amazonaws.com
@@ -189,10 +196,12 @@ jobs:
       - run:
           name: deploying application
           command: |
-            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
+            kubectl get namespace test || kubectl create namespace test
+            helm upgrade app artifacts/acme-0.1.0.tgz -i -n test --wait --set image=$(cat artifacts/image.txt),env=prod,dbusername=postgres,dbpassword=password,dbhost=$(cat artifacts/dbhost.txt)
       - run: 
           name: migrate database 
           command: |
+            sleep 10s
             kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
   
   deploy-prod:
@@ -222,6 +231,7 @@ jobs:
       - run:
           name: deploying application
           command: |
+            kubectl get namespace prod || kubectl create namespace prod
             helm upgrade app artifacts/acme-0.1.0.tgz -i -n prod --wait --set image=$(cat artifacts/image.txt),dbhost=$(cat artifacts/dbhost.txt)
 
       - run: 

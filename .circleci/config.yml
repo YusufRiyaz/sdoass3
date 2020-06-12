@@ -89,8 +89,7 @@ jobs:
       DB_USERNAME: postgres
       DB_PASSWORD: password
       DB_NAME: servian
-      # DB_HOSTNAME: localhost
-      # ENDPOINT: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
+      ENDPOINT: ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com:80
 
     steps: 
       - checkout
@@ -237,13 +236,12 @@ workflows:
       # - integration:
       #     requires: 
       #       - build
-      # - e2e:
-      #     requires:
-      #     - build
-      - package:
+      - e2e:
           requires:
             - build
-            #  - e2e
+      - package:
+          requires:
+            - e2e
           #   - integration
       - deploy-test:
           requires:

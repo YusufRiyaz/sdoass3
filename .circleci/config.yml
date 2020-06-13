@@ -89,7 +89,6 @@ jobs:
       DB_USERNAME: postgres
       DB_PASSWORD: password
       DB_NAME: servian
-      ENDPOINT: http://ac754c64f87c349e595db77d38885e21-1142031128.us-east-1.elb.amazonaws.com
 
     steps: 
       - checkout
@@ -192,6 +191,12 @@ jobs:
           name: migrate database 
           command: |
             kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
+      - run:
+          name: set endpoint for e2e 
+          command: |
+            apt-get install jq -y
+            export  ENDPOINT=http://$(kubectl get service/app -n test -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
+## run in circle ci
   
   deploy-prod:
     machine: true
@@ -236,22 +241,23 @@ workflows:
       - integration:
           requires: 
              - build
-      - e2e:
-          requires:
-            - integration
+      
       - package:
           requires:
-            - e2e
+            - integration
       - deploy-test:
           requires:
             - package
+      - e2e:
+          requires:
+            - deploy-test
       - approval:
           type: approval
           requires: 
-            - deploy-test
+            - e2e
       - deploy-prod:
           requires:
-            - approval
+            - e2e
           filters:
             branches:
               only: master

@@ -257,7 +257,7 @@ workflows:
             - e2e
       - deploy-prod:
           requires:
-            - e2e
+            - approval
           filters:
             branches:
               only: master

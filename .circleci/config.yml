@@ -109,6 +109,7 @@ jobs:
           no_output_timeout: 2m
           command: |
             cd src
+
             npm run start:prod & 
             npx wait-on http://localhost:3000
             npm run test-e2e
@@ -232,16 +233,16 @@ workflows:
   build-test-package:
     jobs:
       - build
-      - integration:
-          requires: 
-             - build
-      - e2e:
-          requires:
-            - integration
-            - deploy-test
+      # - integration:
+      #     requires: 
+      #        - build
+      # - e2e:
+      #     requires:
+      #       - integration
       - package:
           requires:
-            - e2e
+            - build
+          #   - e2e
       - deploy-test:
           requires:
             - package

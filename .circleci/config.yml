@@ -93,24 +93,34 @@ jobs:
     steps: 
       - checkout
 
+      - attach_workspace:
+          at: ./
+
       - run:
           name: setting up environment
           command: |
-            cd src
-            npm install 
-            apt update
-            apt install postgresql-client-10 -y
-            
-            psql -h localhost -U postgres -c "CREATE DATABASE servian;"
+            # install kubectl
+            curl -LO https://storage.googleapis.com/kubernetes-release/release/`curl -s https://storage.googleapis.com/kubernetes-release/release/stable.txt`/bin/linux/amd64/kubectl
+            chmod +x ./kubectl 
+            sudo mv ./kubectl /usr/local/bin/kubectl
 
+            # configure kops
+            curl -LO https://github.com/kubernetes/kops/releases/download/$(curl -s https://api.github.com/repos/kubernetes/kops/releases/latest | grep tag_name | cut -d '"' -f 4)/kops-linux-amd64
+            chmod +x kops-linux-amd64
+            sudo mv kops-linux-amd64 /usr/local/bin/kops
+            kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-hlpovo
+
+            sudo apt-get install jq -y
+            
+            cd src 
+            npm install
       - run: 
           name:  Run End 2 end tests
           no_output_timeout: 2m
           command: |
             cd src
-
-            npm run start:prod & 
-            npx wait-on http://localhost:3000
+            apt-get install jq -y
+            export  ENDPOINT=http://$(kubectl get service/app -n test -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
             npm run test-e2e
 
   package:
@@ -191,12 +201,11 @@ jobs:
           name: migrate database 
           command: |
             kubectl exec deployment/app -n test -- node_modules/.bin/sequelize db:migrate --env production
-      - run:
-          name: set endpoint for e2e 
-          command: |
-            apt-get install jq -y
-            export  ENDPOINT=http://$(kubectl get service/app -n test -o json | jq '.status.loadBalancer.ingress[0].hostname' | sed -e 's/^"//' -e 's/"$//')
-## run in circle ci
+      
+      - persist_to_workspace:
+          root: ./
+          paths:
+            - artifacts
   
   deploy-prod:
     machine: true

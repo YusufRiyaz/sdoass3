@@ -110,7 +110,7 @@ jobs:
             sudo mv kops-linux-amd64 /usr/local/bin/kops
             kops export kubecfg rmit.k8s.local --state s3://rmit-kops-state-hlpovo
 
-            sudo apt-get install jq -y
+            apt-get install jq -y
             
             cd src 
             npm install

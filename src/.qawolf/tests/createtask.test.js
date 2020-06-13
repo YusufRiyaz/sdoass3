@@ -6,7 +6,7 @@ describe('createtask', () => {
 
   beforeAll(async () => {
     try {
-      browser = await launch({ url: process.env.ENDPOINT || "http://localhost:3000/" });
+      browser = await launch({ url: "http://localhost:3000/" || process.env.ENDPOINT });
     }catch(err) {
       console.error(err);
     }

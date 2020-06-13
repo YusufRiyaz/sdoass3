@@ -62,13 +62,11 @@ Helm is a package manager for Kubernetes that allows developers and operators to
 * ### Upgrade application
 * ### List applications grouped by namespaces
 
-To install the Helm CLI, visti [Install Helm](https://helm.sh/docs/intro/install/)
+To install the Helm CLI, visit [Install Helm](https://helm.sh/docs/intro/install/).
 
 
 For more information, visit [Helm](https://helm.sh/docs/).
 __________________________________________________________________________________
-
-
 
 
 
@@ -91,7 +89,7 @@ In the `Makefile`in `/infra`directory declare your
 
 ## Terraform apply
 
-We need to first start the services to AWS by running the environment infrastructure.
+We need to first start the services to AWS by running the environment infrastructure by initialising the `main.tf`file and applying via terraform.
 
 * Change directory to environment where the MakeFile is:
 
@@ -104,6 +102,30 @@ We need to first start the services to AWS by running the environment infrastruc
 ![Alt text](/screenshots/makeup.png?raw=true )
 
 As you can see from the outputs, we would need these outputs to be defined in other folders to successfully deploy the application.
+
+We need to then create a cluster according to the terraform state saved in the S3 bucket as well as attaching a Iam policy.
+
+we can do this by invoking the following command:
+
+ * Make sure you are in the right directory
+
+     `cd environment`
+
+* Run Makefile command:
+
+    `make kube-up`
+
+* Once the command is run, validate by running:
+
+     `make kube-validate`
+
+You will see the following when your cluster is ready:
+
+![Alt text](/screenshots/kubevalidate.png?raw=true )
+
+For this application, a master node is paired with 2 working nodes.
+
+
 
 
 

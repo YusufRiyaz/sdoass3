@@ -81,9 +81,6 @@ jobs:
   e2e:
     docker:
       - image: qawolf/qawolf:v0.9.2
-      - image: postgres:10.7
-        environment:
-          POSTGRES_PASSWORD: password
     environment:
       QAW_HEADLESS: true
       DB_USERNAME: postgres

@@ -19,11 +19,11 @@ spec:
           - name: DB_HOSTNAME
             value: {{ .Values.dbhost }}
           - name: DB_USERNAME
-            value: testuser
+            value: {{.Values.dbusername}}
           - name: DB_PASSWORD
-            value: TestPass
+            value: {{.Values.dbpassword}}
           - name: DB_NAME 
-            value: servian
+            value: {{.Values.dbname}}
         ports:
         - name: http
           protocol: TCP

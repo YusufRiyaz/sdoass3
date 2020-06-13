@@ -1,6 +1,7 @@
-replicaCount: 3
+replicaCount: 1
 env: prod
 image: 
 dbhost:
 dbusername: testuser
 dbpassword: TestPass
+dbname: servian
